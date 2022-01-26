@@ -1,0 +1,132 @@
+version: '3'
+
+services:
+  dev-database:
+    container_name: ${DATABASE_SERVICE_NAME}
+    restart: always
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${DATABASE_ORIGIN_USER}
+      POSTGRES_PASSWORD: ${DATABASE_ORIGIN_PASS}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+    expose:
+      - ${DATABASE_PORT}
+
+  dev-database-admin:
+    container_name: ${DB_ADMIN_SERVICE_NAME}
+    restart: always
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${DB_ADMIN_ORIGIN_USER_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${DB_ADMIN_ORIGIN_PASS}
+      PGADMIN_LISTEN_ADDRESS: ${DB_ADMIN_HOST}
+      PGADMIN_LISTEN_PORT: ${DB_ADMIN_PORT}
+    depends_on:
+      - dev-database
+    expose:
+      - ${DB_ADMIN_PORT}
+
+  dev-backend:
+    container_name: ${BACKEND_SERVICE_NAME}
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    env_file: .env
+    volumes:
+      - ./best_apr_backend:/code:cached
+      - statics_volume:/code/static
+    depends_on:
+      - dev-database
+    expose:
+      - ${BACKEND_PORT}
+    command: gunicorn -c gunicorn.py backend.asgi:application -k uvicorn.workers.UvicornWorker
+
+  dev-celery-broker:
+    container_name: ${BROKER_SERVICE_NAME}
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/celery_broker.Dockerfile
+    expose:
+      - ${BROKER_PORT}
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  dev-http-server:
+    container_name: ${HTTP_SERVER_SERVICE_NAME}
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/http_server.Dockerfile
+    environment:
+      HTTP_SERVER_HOST: ${HTTP_SERVER_HOST}
+      HTTP_SERVER_PORT: ${HTTP_SERVER_PORT}
+      HTTP_SUBDOMAIN: ${HTTP_SUBDOMAIN}
+      HTTP_SUBDOMAIN_PREFIX: ${HTTP_SUBDOMAIN_PREFIX}
+      NGINX_ENVSUBST_TEMPLATE_DIR: ${HTTP_TEMPLATE_DIR}
+      NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx/sites-available
+      BACKEND_SERVICE_NAME: ${BACKEND_SERVICE_NAME}
+      BACKEND_PORT: ${BACKEND_PORT}
+      DB_ADMIN_SERVICE_NAME: ${DB_ADMIN_SERVICE_NAME}
+      DB_ADMIN_PORT: ${DB_ADMIN_PORT}
+    volumes:
+      - statics_volume:/usr/share/nginx/static:ro
+    expose:
+      - ${HTTP_SERVER_PORT}
+    ports:
+      - '${HTTP_SERVER_PORT}:${HTTP_SERVER_PORT}'
+    depends_on:
+      - dev-backend
+      - dev-database-admin
+      - dev-celery-broker
+
+  dev-celery-worker:
+    container_name: ${CELERY_SERVICE_NAME}
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    env_file: .env
+    volumes:
+      - ./best_apr_backend:/code:cached
+    depends_on:
+      - dev-celery-broker
+    # expose:
+    # #   - ${BACKEND_PORT}
+    command:
+    - celery
+    - --app
+    - backend
+    - worker
+    - --loglevel=DEBUG
+    - -E
+#    - --logfile=celery.log
+
+  dev-celery-beat:
+    container_name: ${CELERY_BEAT_SERVICE_NAME}
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    env_file: .env
+    volumes:
+      - ./best_apr_backend:/code:cached
+    depends_on:
+      - dev-celery-broker
+      - dev-celery-worker
+    # expose:
+    #   - ${BACKEND_PORT}
+    command:
+    - celery
+    - --app
+    - backend
+    - beat
+    - --loglevel=DEBUG
+    - -S
+    - django
+
+volumes:
+  db_volume:
+  statics_volume:
