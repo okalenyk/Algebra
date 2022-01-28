@@ -6,6 +6,7 @@ import weakref
 import json
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import router
 from decimal import *
 from eth_utils import to_bytes
@@ -18,7 +19,7 @@ from backend.consts import DEFAULT_CRYPTO_ADDRESS
 #     EtherscanLikeBlockchainExplorer,
 #     RequestToEtherscanLikeAPI,
 # )
-# from contracts.models import Contract, TokenContract
+from contracts.models import PoolContract, Contract
 # from networks.exceptions import TransactionReverted
 # from networks.models import Network, CustomRpcProvider, Transaction
 # from networks.services.functions import convert_to_checksum_address_format
@@ -33,7 +34,7 @@ from best_apr.models import Position
 
 def get_positions_from_subgraph():
     positions_json = send_post_request(settings.SUBGRAPH_URL, json={'query': """query {
-  positions{
+  positions(first:1000, where:{liquidity_gt:0}){
     id
     liquidity
     tickLower{
@@ -42,16 +43,50 @@ def get_positions_from_subgraph():
     tickUpper{
       tickIdx
     }
+    pool{
+      id
+    }
+    token0{
+      symbol
+    }
+    token1{
+      symbol
+    }
   }
 }"""})
     return positions_json['data']['positions']
 
+
+def process_position(raw_position):
+    try:
+        position_object = Position.objects.get(nft_id=raw_position['id'])  # TODO: filter.first
+    except ObjectDoesNotExist:
+        try:
+            pool = PoolContract.objects.get(address=raw_position['pool']['id'])
+        except ObjectDoesNotExist:
+            base_pool_contract = Contract.objects.get(title=settings.BASE_POOL_CONTRACT_TITLE)
+            pool = PoolContract.objects.create(
+                title=raw_position['token0']['symbol'] + ' : ' + raw_position['token1']['symbol'],
+                address=raw_position['pool']['id'],
+                abi=base_pool_contract.abi,
+                network=base_pool_contract.network
+            )
+        position_object = Position.objects.create(
+            last_inner_fee_growth_token_0='1',
+            last_inner_fee_growth_token_1='1',
+            liquidity=raw_position['liquidity'],
+            nft_id=raw_position['id'],
+            pool=pool
+        )
+    print(position_object)
+
+
 def update_positions_last_fee_growth():
     positions_json = get_positions_from_subgraph()
+
+    print(positions_json)
     for raw_position in positions_json:
-        print(raw_position['id'])
-        position_object = Position.objects.get_or_create(pk=int(raw_position['id']))
-        position_object.liquidity = int(raw_position['liquidity'])
+        process_position(raw_position)
 
 # tokens = [
 #     {"address": '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270', "symbol": 'WMATIC'},

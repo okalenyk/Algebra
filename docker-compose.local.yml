@@ -48,17 +48,17 @@ services:
       - ${BACKEND_PORT}
     command: gunicorn -c gunicorn.py backend.asgi:application -k uvicorn.workers.UvicornWorker
 
-  dev-makemigrations:
-    image: dev_backend
-    command: python manage.py makemigrations
-    depends_on:
-      - dev-backend
-
-  dev-migrate:
-    image: dev_backend
-    command: python manage.py migrate
-    depends_on:
-      - dev-makemigrations
+#  dev-makemigrations:
+#    image: dev_backend
+#    command: python manage.py makemigrations
+#    depends_on:
+#      - dev-backend
+#
+#  dev-migrate:
+#    image: dev_backend
+#    command: python manage.py migrate
+#    depends_on:
+#      - dev-makemigrations
 
   dev-celery-broker:
     container_name: ${BROKER_SERVICE_NAME}

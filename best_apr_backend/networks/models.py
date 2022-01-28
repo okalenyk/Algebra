@@ -30,7 +30,7 @@ from backend.consts import (
     TRANSACTION_INFO,
     TRANSACTION_WARNING,
 )
-from networks.types import HASH_LIKE
+from networks.types import HASH_LIKE, ADDRESS_LIKE
 from .exceptions import (
     CustomRpcProviderExceedListRange,
     NetworkNotFound,
@@ -206,13 +206,13 @@ class CustomRpcProvider:
         )
 
     @reset_connection
-    def get_balance(self, address: str):
+    def get_balance(self, address: ADDRESS_LIKE):
         return self.rpc_provider.eth.getBalance(
             convert_to_checksum_address_format(address)
         )
 
     @reset_connection
-    def get_transaction_count(self, address):
+    def get_transaction_count(self, address: ADDRESS_LIKE):
         return self.rpc_provider.eth.getTransactionCount(
             convert_to_checksum_address_format(address),
             'pending'
@@ -223,15 +223,40 @@ class CustomRpcProvider:
         return self.rpc_provider.eth.sendRawTransaction(signed_transaction)
 
     @reset_connection
-    def get_gas_price(self):
-        return self.rpc_provider.eth.gasPrice
+    def get_logs(self, contract, event_name, from_block, to_block):
+        web3_contract_instance = contract.load_contract(
+            provider=self,
+        )
+
+        event = getattr(
+            web3_contract_instance.events,
+            event_name,
+        )
+
+        return event().getLogs(
+            fromBlock=from_block,
+            toBlock=to_block,
+        )
 
     @reset_connection
-    def sign_transaction(self, transaction, private_key):
-        return self.rpc_provider.eth.account.sign_transaction(
-            transaction_dict=transaction,
-            private_key=private_key,
+    def contract_function_call(
+        self,
+        contract,
+        contract_function_name: str,
+        params: tuple,
+        contract_address: str = None,
+    ):
+        if not contract_address:
+            contract_address = contract.address
+
+        contract_function = contract.load_contract(
+            address=contract_address,
+            provider=self,
+        ).get_function_by_name(contract_function_name)(
+            *params
         )
+
+        return contract_function.call()
 
 
 class Transaction(AbstractBaseModel):

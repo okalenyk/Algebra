@@ -16,7 +16,7 @@ from eth_utils import add_0x_prefix
 from web3 import Web3
 # from web3.datastructures import AttributeDict
 # from web3.types import HexBytes, Wei
-from web3.types import HexBytes
+from web3.types import HexBytes, TxParams
 
 from base.models import AbstractBaseModel
 from backend.consts import (
@@ -192,6 +192,29 @@ class Contract(BaseContract):
 
     class Meta:
         db_table = 'contracts'
+        ordering = '-_created_at',
+
+
+class PoolContract(BaseContract):
+    network = ForeignKey(
+        to=Network,
+        on_delete=PROTECT,
+        related_name='network_pool_contracts',
+        verbose_name='Network',
+    )
+
+    def get_fees(
+        self,
+        tickLower,
+        tickUpper,
+    ):
+        contract = self.load_contract()
+        collect_function = contract.get_function_by_name('collect')
+        print(collect_function)
+        #txParams =
+
+    class Meta:
+        db_table = 'pool_contracts'
         ordering = '-_created_at',
 
 
