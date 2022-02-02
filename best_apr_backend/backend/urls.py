@@ -20,6 +20,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
+    path('bestApr/', include('best_apr.urls'))
 ]
 
 if settings.DEBUG and settings.BACKEND_SETTINGS_MODE != 'production':

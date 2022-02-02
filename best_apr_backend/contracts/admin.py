@@ -1,6 +1,6 @@
 from django.contrib.admin import ModelAdmin, register
 
-from .models import TokenContract, PoolContract, Contract
+from .models import TokenContract, Contract
 
 
 # Register your models here.
@@ -79,42 +79,3 @@ class TokenContractModelAdmin(ModelAdmin):
     autocomplete_fields = (
         'network',
     )
-
-@register(PoolContract)
-class PoolContractModelAdmin(ModelAdmin):
-    fields = (
-        'title',
-        'address',
-        # 'provider',
-        # 'network',
-        #'abi',
-        '_is_displayed',
-    )
-    list_display = (
-        'id',
-        'title',
-        'address',
-        'network',
-        '_created_at',
-        '_updated_at',
-        '_is_displayed',
-    )
-    list_filter = (
-        'network__title',
-        '_created_at',
-        '_updated_at',
-        '_is_displayed',
-    )
-    search_fields = (
-        '=id',
-        'title',
-        'address',
-    )
-    ordering = (
-        '-_created_at',
-    )
-    empty_value_display = '-empty-'
-    autocomplete_fields = (
-        'network',
-    )
-

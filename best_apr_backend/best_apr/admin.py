@@ -2,22 +2,28 @@ from django.contrib.admin import ModelAdmin, register
 
 
 # Register your models here.
-from .models import Position
+from .models import Pool
 
 
-@register(Position)
-class PositionAdmin(ModelAdmin):
+@register(Pool)
+class PoolAdmin(ModelAdmin):
     fields = (
-        'last_inner_fee_growth_token_0',
-        'last_inner_fee_growth_token_1',
-        'liquidity',
-        'nft_id',
+        'title',
+        'address',
+        'last_apr'
     )
     list_display = (
-        'nft_id',
-        'liquidity',
+        'title',
+        'address',
+        'last_apr'
     )
     search_fields = (
-        '=nft_id',
+        '=address',
+    )
+    ordering = (
+        '-last_apr',
+    )
+    sortable_by = (
+        'last_apr',
     )
     empty_value_display = '-empty-'

@@ -195,29 +195,6 @@ class Contract(BaseContract):
         ordering = '-_created_at',
 
 
-class PoolContract(BaseContract):
-    network = ForeignKey(
-        to=Network,
-        on_delete=PROTECT,
-        related_name='network_pool_contracts',
-        verbose_name='Network',
-    )
-
-    def get_fees(
-        self,
-        tickLower,
-        tickUpper,
-    ):
-        contract = self.load_contract()
-        collect_function = contract.get_function_by_name('collect')
-        print(collect_function)
-        #txParams =
-
-    class Meta:
-        db_table = 'pool_contracts'
-        ordering = '-_created_at',
-
-
 class TokenContract(BaseContract):
     network = ForeignKey(
         to=Network,

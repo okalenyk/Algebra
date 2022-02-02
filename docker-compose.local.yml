@@ -40,7 +40,7 @@ services:
       dockerfile: docker/backend.Dockerfile
     env_file: .env
     volumes:
-      - ./best_apr_backend:/code:cached
+      - ./best_apr_backend:/code
       - statics_volume:/code/static
     depends_on:
       - dev-database
