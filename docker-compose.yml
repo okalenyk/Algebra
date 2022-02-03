@@ -24,7 +24,7 @@ services:
       PGADMIN_LISTEN_ADDRESS: ${DB_ADMIN_HOST}
       PGADMIN_LISTEN_PORT: ${DB_ADMIN_PORT}
     depends_on:
-      - dev-database
+      - database
     expose:
       - ${DB_ADMIN_PORT}
 
@@ -39,7 +39,7 @@ services:
       - ./best_apr_backend:/code:cached
       - statics_volume:/code/static
     depends_on:
-      - dev-database
+      - database
     expose:
       - ${BACKEND_PORT}
     command: gunicorn -c gunicorn.py backend.asgi:application -k uvicorn.workers.UvicornWorker
@@ -78,9 +78,9 @@ services:
     ports:
       - '${HTTP_SERVER_PORT}:${HTTP_SERVER_PORT}'
     depends_on:
-      - dev-backend
-      - dev-database-admin
-      - dev-celery-broker
+      - backend
+      - database-admin
+      - celery-broker
 
   celery-worker:
     container_name: ${CELERY_SERVICE_NAME}
@@ -92,7 +92,7 @@ services:
     volumes:
       - ./best_apr_backend:/code:cached
     depends_on:
-      - dev-celery-broker
+      - celery-broker
     # expose:
     # #   - ${BACKEND_PORT}
     command:
@@ -114,8 +114,8 @@ services:
     volumes:
       - ./best_apr_backend:/code:cached
     depends_on:
-      - dev-celery-broker
-      - dev-celery-worker
+      - celery-broker
+      - celery-worker
     # expose:
     #   - ${BACKEND_PORT}
     command:
