@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import get_profits
+from .views import ListPoolAprs
 
 urlpatterns = [
-    path('getProfits/', get_profits),
+    path('pools/', ListPoolAprs.as_view(), name='get_pools_apr'),
 ]

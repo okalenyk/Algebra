@@ -5,5 +5,5 @@ from .views import HealthcheckAPIView
 
 urlpatterns = [
     path('healthcheck/', HealthcheckAPIView.as_view(), name='healthcheck'),
-    path('vault-swaps/', include('vault_swaps.urls')),
+    path('APR/', include('best_apr.urls')),
 ]

@@ -101,7 +101,6 @@ def get_previous_block_number():
             number
           }
     }""" % (str(previous_date), str(previous_date - settings.BLOCK_DELTA))})
-    print(block_json)
     return block_json['data']['blocks'][0]['number']
 
 
@@ -143,9 +142,6 @@ def get_current_pools_info():
      }
         }"""})
 
-    debug(pools_json_previous)
-    debug(pools_json)
-
     pools_json = pools_json['data']['pools']
 
     for i in range(len(pools_json)):
@@ -159,6 +155,7 @@ def get_current_pools_info():
             pools_json[i]['feesToken1'] = float(pools_json[i]['feesToken1'])
 
     return pools_json
+
 
 def update_pools_apr():
     positions_json = get_positions_from_subgraph()
@@ -188,12 +185,8 @@ def update_pools_apr():
             )
             amount0 = amount0 / pow(10, int(position['token0']['decimals']))
             amount1 = (amount1 / pow(10, int(position['token1']['decimals'])))
-            print(amount0, amount1)
             pools_current_tvl[position['pool']['id']] += amount0
             pools_current_tvl[position['pool']['id']] += amount1 * float(position['pool']['token0Price'])
-
-    print(pools_fees)
-    print(pools_current_tvl)
 
     for pool in pools_json:
         pool_object = Pool.objects.filter(address=pool['id'])
@@ -209,5 +202,4 @@ def update_pools_apr():
                 (pools_fees[pool_object.address] * 365 / pools_current_tvl[pool['id']]) * 100
         else:
             pool_object.last_apr = 0.0
-        print(pool_object.last_apr)
         pool_object.save()

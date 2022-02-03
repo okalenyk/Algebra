@@ -1,9 +1,18 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-from .services.functions import update_pools_apr
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.core import serializers
+from .models import Pool
+
 
 # Create your views here.
 
-def get_profits(request):
-    update_pools_apr()
-    return HttpResponse('kek')
+class ListPoolAprs(APIView):
+    def get(self, request, format=None):
+        """
+        Return a list of all users.
+        """
+        result = {}
+        for pool in Pool.objects.all():
+            result[pool.address] = pool.last_apr
+        return Response(result)

@@ -240,9 +240,9 @@ CELERY_TASK_SERIALIZER = CELERY_DATA_FORMAT
 CELERY_RESULT_SERIALIZER = CELERY_DATA_FORMAT
 
 CELERY_BEAT_SCHEDULE = {
-    'update_positions_last_fee_growth_task': {
-        'task': 'best_apr.tasks.update_positions_last_fee_growth_task',
-        'schedule': timedelta(seconds=5),
+    'update_pools_apr_task': {
+        'task': 'best_apr.tasks.update_pools_apr_task',
+        'schedule': timedelta(minutes=1),
     },
 }
 
@@ -273,7 +273,6 @@ SUBGRAPH_URL = str(environ.get('SUBGRAPH_URL'))
 SUBGRAPH_BLOCKS_URLS = str(environ.get('SUBGRAPH_BLOCKS_URLS'))
 BLOCK_DELTA = int(environ.get('BLOCK_DELTA'))
 APR_DELTA = int(environ.get('APR_DELTA'))
-BASE_POOL_CONTRACT_TITLE = str(environ.get('BASE_POOL_CONTRACT_TITLE'))
 # NATIVE_TOKEN_ADDRESS = str(environ.get('NATIVE_TOKEN_ADDRESS'))
 # MIN_STAKING_NATIVE_TOKEN_AMOUNT = int(
 #     environ.get('MIN_STAKING_NATIVE_TOKEN_AMOUNT')
