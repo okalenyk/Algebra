@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  dev-database:
+  database:
     container_name: ${DATABASE_SERVICE_NAME}
     restart: always
     image: postgres:latest
@@ -14,7 +14,7 @@ services:
     expose:
       - ${DATABASE_PORT}
 
-  dev-database-admin:
+  database-admin:
     container_name: ${DB_ADMIN_SERVICE_NAME}
     restart: always
     image: dpage/pgadmin4:latest
@@ -28,7 +28,7 @@ services:
     expose:
       - ${DB_ADMIN_PORT}
 
-  dev-backend:
+  backend:
     container_name: ${BACKEND_SERVICE_NAME}
     restart: always
     build:
@@ -44,7 +44,7 @@ services:
       - ${BACKEND_PORT}
     command: gunicorn -c gunicorn.py backend.asgi:application -k uvicorn.workers.UvicornWorker
 
-  dev-celery-broker:
+  celery-broker:
     container_name: ${BROKER_SERVICE_NAME}
     restart: always
     build:
@@ -54,7 +54,7 @@ services:
       - ${BROKER_PORT}
     command: redis-server /usr/local/etc/redis/redis.conf
 
-  dev-http-server:
+  http-server:
     container_name: ${HTTP_SERVER_SERVICE_NAME}
     restart: always
     build:
@@ -82,7 +82,7 @@ services:
       - dev-database-admin
       - dev-celery-broker
 
-  dev-celery-worker:
+  celery-worker:
     container_name: ${CELERY_SERVICE_NAME}
     restart: always
     build:
@@ -104,7 +104,7 @@ services:
     - -E
     - --logfile=celery.log
 
-  dev-celery-beat:
+  celery-beat:
     container_name: ${CELERY_BEAT_SERVICE_NAME}
     restart: always
     build:
