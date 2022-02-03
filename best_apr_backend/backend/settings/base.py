@@ -271,67 +271,8 @@ REST_FRAMEWORK = {
 # # OTHER
 SUBGRAPH_URL = str(environ.get('SUBGRAPH_URL'))
 SUBGRAPH_BLOCKS_URLS = str(environ.get('SUBGRAPH_BLOCKS_URLS'))
+SUBGRAPH_FARMING_URL = str(environ.get('SUBGRAPH_FARMING_URL'))
 BLOCK_DELTA = int(environ.get('BLOCK_DELTA'))
 APR_DELTA = int(environ.get('APR_DELTA'))
-# NATIVE_TOKEN_ADDRESS = str(environ.get('NATIVE_TOKEN_ADDRESS'))
-# MIN_STAKING_NATIVE_TOKEN_AMOUNT = int(
-#     environ.get('MIN_STAKING_NATIVE_TOKEN_AMOUNT')
-# )
-# # ---
-# DEFAULT_SCAN_BLOCK_RANGE = int(environ.get('DEFAULT_SCAN_BLOCK_RANGE'))
-# MIN_CONFIRMATION_BLOCK_COUNT = int(environ.get('MIN_CONFIRMATION_BLOCK_COUNT'))
-# DEFAULT_INCREASING_PERCENT = float(environ.get('DEFAULT_INCREASING_PERCENT'))
-# DEFAULT_MIN_GAS_PRICE = int(environ.get('DEFAULT_MIN_GAS_PRICE'))
-# DEFAULT_GAS_VOLUME_INCREASE_PERCENT = float(
-#     environ.get('DEFAULT_GAS_VOLUME_INCREASE_PERCENT')
-# )
-# DEFAULT_PERCENT_OF_DIFF = float(environ.get('DEFAULT_PERCENT_OF_DIFF'))
-# DEFAULT_GAS_VOLUME = int(environ.get('DEFAULT_GAS_VOLUME'))
-# DEFAULT_AVERAGE_VOLUME_GAS_USED = int(
-#     environ.get('DEFAULT_AVERAGE_VOLUME_GAS_USED')
-# )
-# RELAYER_ADDRESS = str(environ.get('RELAYER_ADDRESS'))
-# VALIDATOR_ADDRESS = str(environ.get('VALIDATOR_ADDRESS'))
-# VALIDATOR_NAME = str(environ.get('VALIDATOR_NAME'))
-# RELAYER_HTTP_URL = str(environ.get('RELAYER_HTTP_URL'))
 DEFAULT_TXN_TIMEOUT = int(environ.get('DEFAULT_TXN_TIMEOUT'))
-# DEFAULT_SCANNER_TIMEOUT = int(environ.get('DEFAULT_SCANNER_TIMEOUT'))
-# DEFAULT_SCANNER_TIMEOUT_FAST = int(environ.get('DEFAULT_SCANNER_TIMEOUT_FAST'))
-# DELAY_SENDING_TXN = {
-#     '1': int(environ.get('DEFAULT_BSC_DELAY_SENDING_TXN')),
-#     '2': int(environ.get('DEFAULT_ETH_DELAY_SENDING_TXN')),
-#     '3': int(environ.get('DEFAULT_POS_DELAY_SENDING_TXN')),
-#     'other': int(environ.get('DEFAULT_DELAY_SENDING_TXN')),
-# }
-# MIN_RELAYER_CRYPTO_BALANCE = {
-#     '1': int(environ.get('DEFAULT_BSC_MIN_RELAYER_CRYPTO_BALANCE')),
-#     '2': int(environ.get('DEFAULT_ETH_MIN_RELAYER_CRYPTO_BALANCE')),
-#     '3': int(environ.get('DEFAULT_POS_MIN_RELAYER_CRYPTO_BALANCE')),
-#     'other': int(environ.get('DEFAULT_MIN_RELAYER_CRYPTO_BALANCE')),
-# }
-# DEFAULT_COUNT_SENDING_TXN = int(
-#     environ.get('DEFAULT_COUNT_SENDING_TXN')
-# )
 DEFAULT_POLL_LATENCY = int(environ.get('DEFAULT_POLL_LATENCY'))
-#
-# MAIN_BACKEND = str(environ.get('MAIN_BACKEND'))
-# RELAYER_URL = str(environ.get('RELAYER_URL'))
-# TOKEN_API = (
-#     f'{MAIN_BACKEND}/api/tokens/'
-#     '?address={address}&network={network_title}'
-# )
-#
-# POLYGON_VAULT_CONTRACT = str(environ.get('POLYGON_VAULT_CONTRACT'))
-# ALGB_CONTRACT = str(environ.get('ALGB_CONTRACT'))
-# TOKEN_MIN_VALUE = int(environ.get('TOKEN_MIN_VALUE'))
-# ALGEBRA_ROUTER = str(environ.get('ALGEBRA_ROUTER'))
-# DEFAULT_SLIPPAGE = float(environ.get('DEFAULT_SLIPPAGE'))
-# VAULT_OWNER_PRIVATE_KEY = str(environ.get('VAULT_OWNER_PRIVATE_KEY'))
-# VAULT_OWNER_ADDRESS = str(environ.get('VAULT_OWNER_ADDRESS'))
-# DEFAULT_SPEED_UP_COUNTER = int(environ.get('DEFAULT_SPEED_UP_COUNTER'))
-# DEFAULT_MAX_HOPS = int(environ.get('DEFAULT_MAX_HOPS'))
-# PERCENT_TO_TRANSFER = float(environ.get('PERCENT_TO_TRANSFER'))
-# ALGEBRA_QUOTE_CONTRACT = str(environ.get('ALGEBRA_QUOTE_CONTRACT'))
-# DEFAULT_START_SCAN_BLOCK = int(environ.get('DEFAULT_START_SCAN_BLOCK'))
-# ALGB_SWAP_CONTRACT = str(environ.get('ALGB_SWAP_CONTRACT'))
-# GAS_STATION_MATIC = str(environ.get('GAS_STATION_MATIC'))

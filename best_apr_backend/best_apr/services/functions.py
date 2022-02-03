@@ -1,36 +1,8 @@
-from logging import exception, info, warn, warning, debug
 from time import time
 from math import sqrt
-from operator import contains
-from typing import List, Tuple
-from copy import deepcopy
-import weakref
-import json
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import router
-from decimal import *
-from eth_utils import to_bytes
-from eth_utils.hexadecimal import add_0x_prefix, remove_0x_prefix
-from web3.exceptions import ContractLogicError
-from web3.types import HexStr
-
-from backend.consts import DEFAULT_CRYPTO_ADDRESS
-# from blockchain_explorers.models import (
-#     EtherscanLikeBlockchainExplorer,
-#     RequestToEtherscanLikeAPI,
-# )
-from contracts.models import Contract
-# from networks.exceptions import TransactionReverted
-# from networks.models import Network, CustomRpcProvider, Transaction
-# from networks.services.functions import convert_to_checksum_address_format
 from base.requests import send_post_request
-# from tokens.models import Token
-from web3.exceptions import (
-    TimeExhausted,
-    TransactionNotFound
-)
 from best_apr.models import Pool
 
 
@@ -42,9 +14,57 @@ def get_amounts(liquidity, tickLower, tickUpper, currentTick):
     currentPrice = tick_to_sqrtPrice(currentTick)
     lowerPrice = tick_to_sqrtPrice(tickLower)
     upperPrice = tick_to_sqrtPrice(tickUpper)
-    amount1 = liquidity * (currentPrice - lowerPrice)
-    amount0 = liquidity * (1 / currentPrice - 1 / upperPrice)
+    if currentPrice < lowerPrice:
+        amount1 = 0
+        amount0 = liquidity * (1 / lowerPrice - 1 / upperPrice)
+    elif lowerPrice <= currentPrice <= upperPrice:
+        amount1 = liquidity * (currentPrice - lowerPrice)
+        amount0 = liquidity * (1 / currentPrice - 1 / upperPrice)
+    else:
+        amount1 = liquidity * (upperPrice - lowerPrice)
+        amount0 = 0
     return amount0, amount1
+
+
+def get_eternal_farmings_id():
+    ids_json = send_post_request(settings.SUBGRAPH_FARMING_URL, json={'query': """query {
+      eternalFarmings(first: 1000,where:{isDetached:false}) {
+        id
+      }
+    }"""})
+
+    return ids_json['data']['eternalFarmings']
+
+
+def get_positions_in_eternal_farming(farming_id):
+    ids_json = send_post_request(settings.SUBGRAPH_FARMING_URL, json={'query': """query {
+      deposits(where:{eternalFarming:"%s"}){
+        id
+      }
+    }""" % farming_id})
+
+    return ids_json['data']['deposits']
+
+
+def get_positions_by_id(ids):
+    ids_array = [i['id'] for i in ids]
+    positions_json = send_post_request(settings.SUBGRAPH_URL, json={'query': """query {
+      positions(where:{id_in:%s}){
+        id
+        liquidity
+        tickLower{
+          tickIdx
+        }
+        tickUpper{
+          tickIdx
+        }
+        pool{
+          tick
+        }
+      }
+    }""" % str(ids_array).replace("'", '"')})
+
+    return positions_json['data']['positions']
 
 
 def get_position_snapshots_from_subgraph():
@@ -203,3 +223,21 @@ def update_pools_apr():
         else:
             pool_object.last_apr = 0.0
         pool_object.save()
+
+
+def update_eternal_farmings_tvl():
+    farmings_id = get_eternal_farmings_id()
+    for farming_id in farmings_id:
+        token_ids = get_positions_in_eternal_farming(farming_id['id'])
+        total_amount0 = 0
+        total_amount1 = 0
+        positions = get_positions_by_id(token_ids)
+        for position in positions:
+            (amount0, amount1) = get_amounts(
+                int(position['liquidity']),
+                int(position['tickLower']['tickIdx']),
+                int(position['tickUpper']['tickIdx']),
+                int(position['pool']['tick']),
+            )
+            total_amount0 += amount0
+            total_amount1 += amount1
