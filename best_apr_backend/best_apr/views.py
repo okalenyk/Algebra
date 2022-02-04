@@ -1,8 +1,6 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .services.functions import update_eternal_farmings_tvl
-from .models import Pool
+from .models import Pool, EternalFarming
 
 
 # Create your views here.
@@ -18,7 +16,9 @@ class ListPoolAprs(APIView):
         return Response(result)
 
 
-class UpdateFarmingsTvl(APIView):
+class ListEternalFarmingsAprs(APIView):
     def get(self, request, format=None):
-        update_eternal_farmings_tvl()
-        return Response('success')
+        result = {}
+        for farming in EternalFarming.objects.all():
+            result[farming.hash] = farming.last_apr
+        return Response(result)

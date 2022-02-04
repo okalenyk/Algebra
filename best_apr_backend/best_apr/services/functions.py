@@ -1,9 +1,10 @@
+from logging import debug
 from time import time
 from math import sqrt
 
 from django.conf import settings
 from base.requests import send_post_request
-from best_apr.models import Pool
+from best_apr.models import Pool, EternalFarming
 
 
 def tick_to_sqrtPrice(tick):
@@ -26,10 +27,25 @@ def get_amounts(liquidity, tickLower, tickUpper, currentTick):
     return amount0, amount1
 
 
-def get_eternal_farmings_id():
+def get_token_info_by_address(address):
+    ids_json = send_post_request(settings.SUBGRAPH_URL, json={'query': """query {
+      tokens(where:{id:"%s"}){
+        derivedMatic
+        decimals
+      }
+    }""" % address})
+
+    return ids_json['data']['tokens']
+
+
+def get_eternal_farmings_info():
     ids_json = send_post_request(settings.SUBGRAPH_FARMING_URL, json={'query': """query {
-      eternalFarmings(first: 1000,where:{isDetached:false}) {
+      eternalFarmings{
         id
+        rewardToken
+        bonusRewardToken
+        rewardRate
+        bonusRewardRate
       }
     }"""})
 
@@ -60,10 +76,14 @@ def get_positions_by_id(ids):
         }
         pool{
           token0{
+            name
             decimals
+            derivedMatic
           }
           token1{
+            name
             decimals
+            derivedMatic
           }
           tick
         }
@@ -231,12 +251,13 @@ def update_pools_apr():
         pool_object.save()
 
 
-def update_eternal_farmings_tvl():
-    farmings_id = get_eternal_farmings_id()
-    for farming_id in farmings_id:
-        token_ids = get_positions_in_eternal_farming(farming_id['id'])
-        total_amount0 = 0
-        total_amount1 = 0
+def update_eternal_farmings_apr():
+    farmings = get_eternal_farmings_info()
+    for farming in farmings:
+        token_ids = get_positions_in_eternal_farming(farming['id'])
+        token0 = get_token_info_by_address(farming['rewardToken'])[0]
+        token1 = get_token_info_by_address(farming['bonusRewardToken'])[0]
+        total_matic_amount = 0.0
         positions = get_positions_by_id(token_ids)
         for position in positions:
             (amount0, amount1) = get_amounts(
@@ -245,6 +266,23 @@ def update_eternal_farmings_tvl():
                 int(position['tickUpper']['tickIdx']),
                 int(position['pool']['tick']),
             )
-            total_amount0 += amount0 / 10**int(position['pool']['token0']['decimals'])
-            total_amount1 += amount1 / 10**int(position['pool']['token1']['decimals'])
-        print(farming_id, total_amount0, total_amount1)
+            total_matic_amount += amount0 * \
+                                  float(position['pool']['token0']['derivedMatic']) \
+                                  / 10 ** int(position['pool']['token0']['decimals'])
+            total_matic_amount += amount1 \
+                                  * float(position['pool']['token1']['derivedMatic']) \
+                                  / 10 ** int(position['pool']['token1']['decimals'])
+        reward0_per_second = int(farming['rewardRate']) * float(token0['derivedMatic']) / 10 ** int(token0['decimals'])
+        reward1_per_second = int(farming['bonusRewardRate']) * float(token1['derivedMatic']) / 10 ** int(token1['decimals'])
+        apr = (reward0_per_second + reward1_per_second) / total_matic_amount * 60 * 60 * 24 * 365 * 100
+
+        farming_object = EternalFarming.objects.filter(hash=farming['id'])
+        if not farming_object:
+            farming_object = EternalFarming.objects.create(
+                hash=farming['id'],
+            )
+        else:
+            farming_object = farming_object[0]
+        farming_object.last_apr = apr
+        farming_object.matic_amount = total_matic_amount
+        farming_object.save()

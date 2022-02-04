@@ -10,6 +10,6 @@ class Pool(AbstractBaseModel):
 
 
 class EternalFarming(AbstractBaseModel):
-    title = models.CharField(max_length=64)
     hash = models.CharField(max_length=66, unique=True)
-    tvl = models.BigIntegerField(blank=True, null=True)
+    matic_amount = models.FloatField(blank=True, null=True)
+    last_apr = models.FloatField(blank=True, null=True)
