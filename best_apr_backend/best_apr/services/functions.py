@@ -59,6 +59,12 @@ def get_positions_by_id(ids):
           tickIdx
         }
         pool{
+          token0{
+            decimals
+          }
+          token1{
+            decimals
+          }
           tick
         }
       }
@@ -239,5 +245,6 @@ def update_eternal_farmings_tvl():
                 int(position['tickUpper']['tickIdx']),
                 int(position['pool']['tick']),
             )
-            total_amount0 += amount0
-            total_amount1 += amount1
+            total_amount0 += amount0 / 10**int(position['pool']['token0']['decimals'])
+            total_amount1 += amount1 / 10**int(position['pool']['token1']['decimals'])
+        print(farming_id, total_amount0, total_amount1)
