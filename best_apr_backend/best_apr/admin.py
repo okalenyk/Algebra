@@ -32,7 +32,7 @@ class PoolAdmin(ModelAdmin):
 class EternalFarmingAdmin(ModelAdmin):
     fields = (
         'hash',
-        'matic_amount'
+        'matic_amount',
         'last_apr'
     )
     list_display = (
