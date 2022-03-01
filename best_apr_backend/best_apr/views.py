@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Pool, EternalFarming
+from logging import debug
 
 
 # Create your views here.
@@ -19,6 +20,12 @@ class ListPoolAprs(APIView):
 class ListEternalFarmingsAprs(APIView):
     def get(self, request, format=None):
         result = {}
-        for farming in EternalFarming.objects.all():
+
+        try:
+            network_name = request.GET['network']
+        except KeyError:
+            network_name = 'Polygon'
+
+        for farming in EternalFarming.objects.filter(network__title=network_name):
             result[farming.hash] = farming.last_apr
         return Response(result)
