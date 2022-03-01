@@ -8,11 +8,14 @@ from logging import debug
 
 class ListPoolAprs(APIView):
     def get(self, request, format=None):
-        """
-        Return a list of all users.
-        """
         result = {}
-        for pool in Pool.objects.all():
+
+        try:
+            network_name = request.GET['network']
+        except KeyError:
+            network_name = 'Polygon'
+
+        for pool in Pool.objects.filter(network__title=network_name):
             result[pool.address] = pool.last_apr
         return Response(result)
 
