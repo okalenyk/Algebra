@@ -1,5 +1,4 @@
-from django.contrib.admin import ModelAdmin, register
-
+from django.contrib.admin import ModelAdmin, register, display
 
 # Register your models here.
 from .models import Pool, EternalFarming
@@ -14,8 +13,12 @@ class PoolAdmin(ModelAdmin):
     )
     list_display = (
         'title',
+        'network',
         'address',
         'last_apr'
+    )
+    list_filter = (
+        'network__title',
     )
     search_fields = (
         '=address',
@@ -25,8 +28,10 @@ class PoolAdmin(ModelAdmin):
     )
     sortable_by = (
         'last_apr',
+        'network',
     )
     empty_value_display = '-empty-'
+
 
 @register(EternalFarming)
 class EternalFarmingAdmin(ModelAdmin):
@@ -38,7 +43,11 @@ class EternalFarmingAdmin(ModelAdmin):
     list_display = (
         'hash',
         'matic_amount',
+        'network',
         'last_apr'
+    )
+    list_filter = (
+        'network__title',
     )
     search_fields = (
         '=hash',
@@ -48,5 +57,6 @@ class EternalFarmingAdmin(ModelAdmin):
     )
     sortable_by = (
         'last_apr',
+        'network'
     )
     empty_value_display = '-empty-'

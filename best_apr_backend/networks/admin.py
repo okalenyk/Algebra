@@ -9,6 +9,9 @@ class NetworkModelAdmin(ModelAdmin):
     fields = (
         'title',
         'rpc_url_list',
+        'subgraph_url',
+        'subgraph_blocks_urls',
+        'subgraph_farming_url',
         '_is_displayed',
     )
     list_display = (

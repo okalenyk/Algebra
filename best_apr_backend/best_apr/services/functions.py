@@ -1,20 +1,17 @@
-from logging import debug
-from time import time
 from math import sqrt
 
-from django.conf import settings
-from base.requests import send_post_request
+from networks.models import Network
 from best_apr.models import Pool, EternalFarming
 
 
-def tick_to_sqrtPrice(tick):
+def tick_to_sqrt_price(tick):
     return sqrt(pow(1.0001, tick))
 
 
 def get_amounts(liquidity, tickLower, tickUpper, currentTick):
-    currentPrice = tick_to_sqrtPrice(currentTick)
-    lowerPrice = tick_to_sqrtPrice(tickLower)
-    upperPrice = tick_to_sqrtPrice(tickUpper)
+    currentPrice = tick_to_sqrt_price(currentTick)
+    lowerPrice = tick_to_sqrt_price(tickLower)
+    upperPrice = tick_to_sqrt_price(tickUpper)
     if currentPrice < lowerPrice:
         amount1 = 0
         amount0 = liquidity * (1 / lowerPrice - 1 / upperPrice)
@@ -27,185 +24,9 @@ def get_amounts(liquidity, tickLower, tickUpper, currentTick):
     return amount0, amount1
 
 
-def get_token_info_by_address(address):
-    ids_json = send_post_request(settings.SUBGRAPH_URL, json={'query': """query {
-      tokens(where:{id:"%s"}){
-        derivedMatic
-        decimals
-      }
-    }""" % address})
-
-    return ids_json['data']['tokens']
-
-
-def get_eternal_farmings_info():
-    ids_json = send_post_request(settings.SUBGRAPH_FARMING_URL, json={'query': """query {
-      eternalFarmings{
-        id
-        rewardToken
-        bonusRewardToken
-        rewardRate
-        bonusRewardRate
-      }
-    }"""})
-
-    return ids_json['data']['eternalFarmings']
-
-
-def get_positions_in_eternal_farming(farming_id):
-    ids_json = send_post_request(settings.SUBGRAPH_FARMING_URL, json={'query': """query {
-      deposits(where:{eternalFarming:"%s"}){
-        id
-      }
-    }""" % farming_id})
-
-    return ids_json['data']['deposits']
-
-
-def get_positions_by_id(ids):
-    ids_array = [i['id'] for i in ids]
-    positions_json = send_post_request(settings.SUBGRAPH_URL, json={'query': """query {
-      positions(where:{id_in:%s}){
-        id
-        liquidity
-        tickLower{
-          tickIdx
-        }
-        tickUpper{
-          tickIdx
-        }
-        pool{
-          token0{
-            name
-            decimals
-            derivedMatic
-          }
-          token1{
-            name
-            decimals
-            derivedMatic
-          }
-          tick
-        }
-      }
-    }""" % str(ids_array).replace("'", '"')})
-
-    return positions_json['data']['positions']
-
-
-def get_position_snapshots_from_subgraph():
-    positions_json = send_post_request(settings.SUBGRAPH_URL, json={'query': """query {
-  positionSnapshots{
-    liquidity,
-    feeGrowthInside0LastX128,
-    feeGrowthInside1LastX128,
-    position{
-      id
-      tickLower{
-        tickIdx
-      }
-      tickUpper{
-        tickIdx
-      }
-    }
-  }
-}"""})
-    return positions_json['data']['positionSnapshots']
-
-
-def get_positions_from_subgraph():
-    positions_json = send_post_request(settings.SUBGRAPH_URL, json={'query': """query {
-    positions(first:1000){
-    tickLower{
-        tickIdx
-    }
-    tickUpper{
-        tickIdx
-    }
-    liquidity
-    depositedToken0
-    depositedToken1
-    token0{
-      decimals
-    }
-    token1{
-      decimals
-    }
-    pool{
-      id
-      token0Price
-    }
-  }
-    }"""})
-    return positions_json['data']['positions']
-
-
-def get_previous_block_number():
-    previous_date = int(time()) - settings.APR_DELTA
-    block_json = send_post_request(settings.SUBGRAPH_BLOCKS_URLS, json={'query': """query {
-        blocks(first: 1, orderBy: timestamp, orderDirection: desc, where:{timestamp_lt:%s, timestamp_gt:%s}) {
-            number
-          }
-    }""" % (str(previous_date), str(previous_date - settings.BLOCK_DELTA))})
-    return block_json['data']['blocks'][0]['number']
-
-
-def get_current_pools_info():
-    pools_json_previous_raw = send_post_request(settings.SUBGRAPH_URL, json={'query': """query {
-    pools(block:{number:%s},first: 1000, orderBy: id){
-        feesToken0
-        feesToken1
-        id
-        token0{
-        name
-        }
-        token1{
-        name
-        }
-        token0Price
-        tick
-     }
-        }""" % get_previous_block_number()})
-
-    pools_json_previous = {}
-
-    for pool in pools_json_previous_raw['data']['pools']:
-        pools_json_previous[pool['id']] = {'feesToken0': pool['feesToken0'], 'feesToken1': pool['feesToken1']}
-
-    pools_json = send_post_request(settings.SUBGRAPH_URL, json={'query': """query {
-    pools(first: 1000, orderBy: id){
-        feesToken0
-        feesToken1
-        id
-        token0{
-        name
-        }
-        token1{
-        name
-        }
-        token0Price
-        tick
-     }
-        }"""})
-
-    pools_json = pools_json['data']['pools']
-
-    for i in range(len(pools_json)):
-        try:
-            pools_json[i]['feesToken0'] = \
-                float(pools_json[i]['feesToken0']) - float(pools_json_previous[pools_json[i]['id']]['feesToken0'])
-            pools_json[i]['feesToken1'] = \
-                float(pools_json[i]['feesToken1']) - float(pools_json_previous[pools_json[i]['id']]['feesToken1'])
-        except KeyError:
-            pools_json[i]['feesToken0'] = float(pools_json[i]['feesToken0'])
-            pools_json[i]['feesToken1'] = float(pools_json[i]['feesToken1'])
-
-    return pools_json
-
-
-def update_pools_apr():
-    positions_json = get_positions_from_subgraph()
-    pools_json = get_current_pools_info()
+def update_pools_apr(network: Network):
+    positions_json = network.get_positions_from_subgraph()
+    pools_json = network.get_current_pools_info()
 
     pools_tick = {}
     pools_current_tvl = {}
@@ -240,6 +61,7 @@ def update_pools_apr():
             pool_object = Pool.objects.create(
                 title=pool['token0']['name'] + ' : ' + pool['token1']['name'],
                 address=pool['id'],
+                network=network
             )
         else:
             pool_object = pool_object[0]
@@ -251,14 +73,16 @@ def update_pools_apr():
         pool_object.save()
 
 
-def update_eternal_farmings_apr():
-    farmings = get_eternal_farmings_info()
+def update_eternal_farmings_apr(network: Network):
+    farmings = network.get_eternal_farmings_info()
     for farming in farmings:
-        token_ids = get_positions_in_eternal_farming(farming['id'])
-        token0 = get_token_info_by_address(farming['rewardToken'])[0]
-        token1 = get_token_info_by_address(farming['bonusRewardToken'])[0]
+        token_ids = network.get_positions_in_eternal_farming(farming['id'])
+        print(farming['rewardToken'])
+        print(network.get_token_info_by_address(farming['rewardToken']))
+        token0 = network.get_token_info_by_address(farming['rewardToken'])[0]
+        token1 = network.get_token_info_by_address(farming['bonusRewardToken'])[0]
         total_matic_amount = 0.0
-        positions = get_positions_by_id(token_ids)
+        positions = network.get_positions_by_id(token_ids)
         for position in positions:
             (amount0, amount1) = get_amounts(
                 int(position['liquidity']),
@@ -274,12 +98,15 @@ def update_eternal_farmings_apr():
                                   / 10 ** int(position['pool']['token1']['decimals'])
         reward0_per_second = int(farming['rewardRate']) * float(token0['derivedMatic']) / 10 ** int(token0['decimals'])
         reward1_per_second = int(farming['bonusRewardRate']) * float(token1['derivedMatic']) / 10 ** int(token1['decimals'])
-        apr = (reward0_per_second + reward1_per_second) / total_matic_amount * 60 * 60 * 24 * 365 * 100
+        apr = (reward0_per_second + reward1_per_second) \
+            / total_matic_amount * 60 * 60 * 24 * 365 * 100 if total_matic_amount > 0 else \
+            -1.0
 
         farming_object = EternalFarming.objects.filter(hash=farming['id'])
         if not farming_object:
             farming_object = EternalFarming.objects.create(
                 hash=farming['id'],
+                network=network
             )
         else:
             farming_object = farming_object[0]

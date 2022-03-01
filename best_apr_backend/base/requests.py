@@ -31,8 +31,8 @@ def send_post_request(url, params=None, json=None):
 
     if response.status_code != HTTP_200_OK:
         error_message = REQUEST_ERROR.format(
-            f'URL \"{url}\" with params \"{params}\" isn\'t successfuly '
-            f'responsed!\nRESPONSE STATUS CODE: \"{response.status_code}\".'
+            f'URL \"{url}\" with params \"{params}\" isn\'t successfully '
+            f'responsed!\nJSON: \"{json}\" \nRESPONSE STATUS CODE: \"{response.status_code}\".'
         )
 
         exception(error_message)
