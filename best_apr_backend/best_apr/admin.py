@@ -1,7 +1,7 @@
 from django.contrib.admin import ModelAdmin, register, display
 
 # Register your models here.
-from .models import Pool, EternalFarming
+from .models import Pool, EternalFarming, LimitFarming
 
 
 @register(Pool)
@@ -57,6 +57,32 @@ class EternalFarmingAdmin(ModelAdmin):
     )
     sortable_by = (
         'last_apr',
+        'network'
+    )
+    empty_value_display = '-empty-'
+
+
+@register(LimitFarming)
+class LimitFarmingAdmin(ModelAdmin):
+    fields = (
+        'hash',
+        'matic_amount',
+    )
+    list_display = (
+        'hash',
+        'matic_amount',
+        'network',
+    )
+    list_filter = (
+        'network__title',
+    )
+    search_fields = (
+        '=hash',
+    )
+    ordering = (
+        '-matic_amount',
+    )
+    sortable_by = (
         'network'
     )
     empty_value_display = '-empty-'

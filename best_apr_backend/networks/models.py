@@ -183,9 +183,27 @@ class Network(AbstractBaseModel):
 
         return ids_json['data']['eternalFarmings']
 
+    def get_limit_farmings_info(self, ):
+        ids_json = send_post_request(self.subgraph_farming_url, json={'query': """query {
+          incentives{
+            id
+          }
+        }"""})
+
+        return ids_json['data']['incentives']
+
     def get_positions_in_eternal_farming(self, farming_id):
         ids_json = send_post_request(self.subgraph_farming_url, json={'query': """query {
           deposits(where:{eternalFarming:"%s"}){
+            id
+          }
+        }""" % farming_id})
+
+        return ids_json['data']['deposits']
+
+    def get_positions_in_limit_farming(self, farming_id):
+        ids_json = send_post_request(self.subgraph_farming_url, json={'query': """query {
+          deposits(where:{incentive:"%s"}){
             id
           }
         }""" % farming_id})

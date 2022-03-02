@@ -1,7 +1,7 @@
 from math import sqrt
 
 from networks.models import Network
-from best_apr.models import Pool, EternalFarming
+from best_apr.models import Pool, EternalFarming, LimitFarming
 
 
 def tick_to_sqrt_price(tick):
@@ -77,8 +77,6 @@ def update_eternal_farmings_apr(network: Network):
     farmings = network.get_eternal_farmings_info()
     for farming in farmings:
         token_ids = network.get_positions_in_eternal_farming(farming['id'])
-        print(farming['rewardToken'])
-        print(network.get_token_info_by_address(farming['rewardToken']))
         token0 = network.get_token_info_by_address(farming['rewardToken'])[0]
         token1 = network.get_token_info_by_address(farming['bonusRewardToken'])[0]
         total_matic_amount = 0.0
@@ -97,9 +95,10 @@ def update_eternal_farmings_apr(network: Network):
                                   * float(position['pool']['token1']['derivedMatic']) \
                                   / 10 ** int(position['pool']['token1']['decimals'])
         reward0_per_second = int(farming['rewardRate']) * float(token0['derivedMatic']) / 10 ** int(token0['decimals'])
-        reward1_per_second = int(farming['bonusRewardRate']) * float(token1['derivedMatic']) / 10 ** int(token1['decimals'])
+        reward1_per_second = int(farming['bonusRewardRate']) * float(token1['derivedMatic']) / 10 ** int(
+            token1['decimals'])
         apr = (reward0_per_second + reward1_per_second) \
-            / total_matic_amount * 60 * 60 * 24 * 365 * 100 if total_matic_amount > 0 else \
+              / total_matic_amount * 60 * 60 * 24 * 365 * 100 if total_matic_amount > 0 else \
             -1.0
 
         farming_object = EternalFarming.objects.filter(hash=farming['id'])
@@ -111,5 +110,37 @@ def update_eternal_farmings_apr(network: Network):
         else:
             farming_object = farming_object[0]
         farming_object.last_apr = apr
+        farming_object.matic_amount = total_matic_amount
+        farming_object.save()
+
+
+def update_limit_farmings_tvl(network: Network):
+    farmings = network.get_limit_farmings_info()
+    for farming in farmings:
+        token_ids = network.get_positions_in_limit_farming(farming['id'])
+        total_matic_amount = 0.0
+        positions = network.get_positions_by_id(token_ids)
+        for position in positions:
+            (amount0, amount1) = get_amounts(
+                int(position['liquidity']),
+                int(position['tickLower']['tickIdx']),
+                int(position['tickUpper']['tickIdx']),
+                int(position['pool']['tick']),
+            )
+            total_matic_amount += amount0 * \
+                                  float(position['pool']['token0']['derivedMatic']) \
+                                  / 10 ** int(position['pool']['token0']['decimals'])
+            total_matic_amount += amount1 \
+                                  * float(position['pool']['token1']['derivedMatic']) \
+                                  / 10 ** int(position['pool']['token1']['decimals'])
+
+        farming_object = LimitFarming.objects.filter(hash=farming['id'])
+        if not farming_object:
+            farming_object = LimitFarming.objects.create(
+                hash=farming['id'],
+                network=network
+            )
+        else:
+            farming_object = farming_object[0]
         farming_object.matic_amount = total_matic_amount
         farming_object.save()
