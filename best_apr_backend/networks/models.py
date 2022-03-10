@@ -187,6 +187,11 @@ class Network(AbstractBaseModel):
         ids_json = send_post_request(self.subgraph_farming_url, json={'query': """query {
           incentives{
             id
+            rewardToken
+            bonusRewardToken
+            reward
+            bonusReward
+            startTime
           }
         }"""})
 
