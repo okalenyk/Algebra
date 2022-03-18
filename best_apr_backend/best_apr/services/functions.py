@@ -1,5 +1,6 @@
 from math import sqrt
 
+from datetime import datetime
 from networks.models import Network
 from best_apr.models import Pool, EternalFarming, LimitFarming
 
@@ -114,10 +115,12 @@ def update_eternal_farmings_apr(network: Network):
         farming_object.save()
 
 
-def update_limit_farmings_tvl(network: Network):
+def update_limit_farmings_apr(network: Network):
     farmings = network.get_limit_farmings_info()
     for farming in farmings:
         token_ids = network.get_positions_in_limit_farming(farming['id'])
+        token0 = network.get_token_info_by_address(farming['rewardToken'])[0]
+        token1 = network.get_token_info_by_address(farming['bonusRewardToken'])[0]
         total_matic_amount = 0.0
         positions = network.get_positions_by_id(token_ids)
         for position in positions:
@@ -134,6 +137,15 @@ def update_limit_farmings_tvl(network: Network):
                                   * float(position['pool']['token1']['derivedMatic']) \
                                   / 10 ** int(position['pool']['token1']['decimals'])
 
+        duration = 86400 * 365 / (int(farming['endTime']) - int(farming['startTime']))
+        rewards_amount_0 = int(farming['reward']) * float(token0['derivedMatic']) / \
+                           10 ** int(token0['decimals'])
+        rewards_amount_1 = int(farming['bonusReward']) * float(token1['derivedMatic']) / \
+                           10 ** int(token1['decimals'])
+
+        apr = (rewards_amount_0 + rewards_amount_1) * duration / total_matic_amount * 100 \
+            if total_matic_amount > 0 and int(farming['endTime']) > int(datetime.now().timestamp()) else -1
+
         farming_object = LimitFarming.objects.filter(hash=farming['id'])
         if not farming_object:
             farming_object = LimitFarming.objects.create(
@@ -143,4 +155,5 @@ def update_limit_farmings_tvl(network: Network):
         else:
             farming_object = farming_object[0]
         farming_object.matic_amount = total_matic_amount
+        farming_object.last_apr = apr
         farming_object.save()

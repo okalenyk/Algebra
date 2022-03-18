@@ -67,11 +67,13 @@ class LimitFarmingAdmin(ModelAdmin):
     fields = (
         'hash',
         'matic_amount',
+        'last_apr'
     )
     list_display = (
         'hash',
         'matic_amount',
         'network',
+        'last_apr'
     )
     list_filter = (
         'network__title',
@@ -80,9 +82,10 @@ class LimitFarmingAdmin(ModelAdmin):
         '=hash',
     )
     ordering = (
-        '-matic_amount',
+        '-last_apr',
     )
     sortable_by = (
+        'last_apr',
         'network'
     )
     empty_value_display = '-empty-'

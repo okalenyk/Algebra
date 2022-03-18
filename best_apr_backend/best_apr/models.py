@@ -21,4 +21,5 @@ class EternalFarming(AbstractBaseModel):
 class LimitFarming(AbstractBaseModel):
     hash = models.CharField(max_length=66, unique=True)
     matic_amount = models.FloatField(blank=True, null=True)
+    last_apr = models.FloatField(blank=True, null=True)
     network = models.ForeignKey(Network, on_delete=models.CASCADE)

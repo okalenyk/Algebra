@@ -192,6 +192,7 @@ class Network(AbstractBaseModel):
             reward
             bonusReward
             startTime
+            endTime
           }
         }"""})
 
