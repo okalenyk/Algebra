@@ -137,6 +137,7 @@ dmypy.json
 .vscode
 __pycache__
 static
+best_apr_backend/backend/media
 
 # EXCLUDE FILES
 .env*
