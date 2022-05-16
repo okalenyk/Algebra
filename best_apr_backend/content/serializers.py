@@ -35,6 +35,7 @@ class EventSerializer(ModelSerializer):
             'level2_bonus',
             'level3_lock',
             'level3_bonus',
+            'locked_token',
         )
 
 

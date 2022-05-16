@@ -27,6 +27,7 @@ class Event(AbstractBaseModel):
     level2_bonus = models.IntegerField(null=True, blank=True, verbose_name='Level 2 bonus')
     level3_lock = models.IntegerField(null=True, blank=True, verbose_name='Required for level 3')
     level3_bonus = models.IntegerField(null=True, blank=True, verbose_name='Level 3 bonus')
+    locked_token = models.CharField(null=True, blank=True, max_length=42, verbose_name='Address of locked token')
     app_link = models.URLField(null=True, blank=True, verbose_name='App link')
     article_link = models.URLField(null=True, blank=True, verbose_name='Article link')
     image = models.ImageField(null=True, blank=True, verbose_name='Image', upload_to='events/')
@@ -47,6 +48,8 @@ class Event(AbstractBaseModel):
                 errors['level3_lock'] = ['Must set required amount for level 3 for tier farming',]
             if self.level3_bonus is None:
                 errors['level3_bonus'] = ['Must set bonus for level 3 for tier farming',]
+            if self.locked_token is None:
+                errors['locked_token'] = ['Must set locked token for tier farming', ]
         if errors != {}:
             raise ValidationError(errors)
 
