@@ -29,6 +29,12 @@ class EventSerializer(ModelSerializer):
             'app_link',
             'article_link',
             'image',
+            'level1_lock',
+            'level1_bonus',
+            'level2_lock',
+            'level2_bonus',
+            'level3_lock',
+            'level3_bonus',
         )
 
 
