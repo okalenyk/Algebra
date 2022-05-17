@@ -38,6 +38,7 @@ services:
     volumes:
       - ./best_apr_backend:/code:cached
       - statics_volume:/code/static
+      - media_volume:/code/backend/media
     depends_on:
       - database
     expose:
@@ -73,6 +74,7 @@ services:
       DB_ADMIN_PORT: ${DB_ADMIN_PORT}
     volumes:
       - statics_volume:/usr/share/nginx/static:ro
+      - media_volume:/usr/share/nginx/media:ro
     expose:
       - ${HTTP_SERVER_PORT}
     ports:
@@ -130,3 +132,4 @@ services:
 volumes:
   db_volume:
   statics_volume:
+  media_volume:
