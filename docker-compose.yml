@@ -74,7 +74,7 @@ services:
       DB_ADMIN_PORT: ${DB_ADMIN_PORT}
     volumes:
       - statics_volume:/usr/share/nginx/static:ro
-      - media_volume:/usr/share/nginx/media:ro
+      - media_volume:/usr/share/nginx/media
     expose:
       - ${HTTP_SERVER_PORT}
     ports:
