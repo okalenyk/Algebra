@@ -23,11 +23,11 @@ urlpatterns = [
     path('api/', include('api.urls')),
 ]
 
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
 if settings.DEBUG and settings.BACKEND_SETTINGS_MODE != 'production':
     import debug_toolbar
 
     urlpatterns += [
         path('__debug__/', include(debug_toolbar.urls)),
     ]
+
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

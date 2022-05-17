@@ -21,6 +21,11 @@ server {
     alias $nginx_statics/static/;
   }
 
+  location /media/ {
+    autoindex on;
+    alias $nginx_statics/media/;
+  }
+
   location /pgadmin/ {
     proxy_pass http://${DB_ADMIN_SERVICE_NAME};
     proxy_redirect off;
