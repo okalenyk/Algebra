@@ -1,8 +1,9 @@
-from rest_framework.response import Response
+from django.http import JsonResponse
 from rest_framework.viewsets import ModelViewSet
 
 from .models import Event, Publication
 from .serializers import EventSerializer, PublicationsSerializer
+from logging import debug
 
 # Create your views here.
 
@@ -14,7 +15,7 @@ class ListEvents(ModelViewSet):
     def get(self, request):
         serializer = self.get_serializer(self.queryset, many=True)
 
-        return Response(serializer.data)
+        return JsonResponse(serializer.data, safe=False)
 
 
 class ListPublications(ModelViewSet):
@@ -24,4 +25,4 @@ class ListPublications(ModelViewSet):
     def get(self, request):
         serializer = self.get_serializer(self.queryset, many=True)
 
-        return Response(serializer.data)
+        return JsonResponse(serializer.data, safe=False)
