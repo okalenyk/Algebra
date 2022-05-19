@@ -9,13 +9,13 @@ from .serializers import EventSerializer, PublicationsSerializer
 
 class ListEvents(APIView):
     def get(self, request, format=None):
-        serializer = EventSerializer(Event.objects.all(), many=True)
+        serializer = EventSerializer(Event.objects.all(), many=True, context={"request": request})
 
         return JsonResponse(serializer.data, safe=False)
 
 
 class ListPublications(APIView):
     def get(self, request, format=None):
-        serializer = PublicationsSerializer(Publication.objects.all(), many=True)
+        serializer = PublicationsSerializer(Publication.objects.all(), many=True, context={"request": request})
 
         return JsonResponse(serializer.data, safe=False)
