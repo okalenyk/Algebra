@@ -19,6 +19,7 @@ class EventAdmin(ModelAdmin):
                 'app_link',
                 'article_link',
                 'image',
+                'token_image',
             )
         }),
         ('Tier farming info', {

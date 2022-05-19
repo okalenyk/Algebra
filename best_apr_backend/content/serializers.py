@@ -11,10 +11,22 @@ class TimestampField(serializers.Field):
         return int(value.timestamp())
 
 
+class ImageField(serializers.Field):
+    def to_representation(self, value):
+        if not value:
+            return None
+
+        request = self.context.get('request')
+        image_url = value.url
+        return request.build_absolute_uri(image_url)
+
+
 class EventSerializer(ModelSerializer):
     start_date = TimestampField()
     end_date = TimestampField()
     entry_date = TimestampField()
+    image = ImageField()
+    token_image = ImageField()
 
     class Meta:
         model = Event
@@ -29,6 +41,7 @@ class EventSerializer(ModelSerializer):
             'app_link',
             'article_link',
             'image',
+            'token_image',
             'level1_lock',
             'level1_bonus',
             'level2_lock',

@@ -31,6 +31,7 @@ class Event(AbstractBaseModel):
     app_link = models.URLField(null=True, blank=True, verbose_name='App link')
     article_link = models.URLField(null=True, blank=True, verbose_name='Article link')
     image = models.ImageField(null=True, blank=True, verbose_name='Image', upload_to='events/')
+    token_image = models.ImageField(null=True, blank=True, verbose_name='Token image', upload_to='events/tokens/')
     description = models.CharField(max_length=512, null=True, blank=True, verbose_name='Description')
 
     def clean_fields(self, exclude=None):
