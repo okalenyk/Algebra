@@ -282,6 +282,15 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
+#EMAIL
+EMAIL_HOST = str(environ.get('EMAIL_HOST'))
+EMAIL_PORT = str(environ.get('EMAIL_PORT'))
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = str(environ.get('EMAIL_HOST_USER'))
+EMAIL_HOST_PASSWORD = str(environ.get('EMAIL_HOST_PASSWORD'))
+EMAIL_TO = str(environ.get('EMAIL_TO'))
+
 # # OTHER
 SUBGRAPH_URL = str(environ.get('SUBGRAPH_URL'))
 SUBGRAPH_BLOCKS_URLS = str(environ.get('SUBGRAPH_BLOCKS_URLS'))
