@@ -12,6 +12,7 @@ bind = '{}:{}'.format(
 )
 max_requests = 1000
 workers = max_workers() + 1
+#limit_request_field_size = 0
 
 env = {
     'DJANGO_SETTINGS_MODULE': 'backend.settings.{}'.format(
