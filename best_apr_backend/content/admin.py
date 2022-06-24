@@ -10,6 +10,7 @@ class EventAdmin(ModelAdmin):
         ('General', {
             'fields': (
                 'title',
+                '_created_at',
                 'description',
                 'start_date',
                 'entry_date',
@@ -35,10 +36,11 @@ class EventAdmin(ModelAdmin):
             ),
         }),
     )
+    readonly_fields = ('_created_at',)
     list_display = (
         'title',
         'start_date',
-        'kind',
+        '_created_at',
     )
     list_filter = (
         'kind',
@@ -51,6 +53,7 @@ class EventAdmin(ModelAdmin):
     )
     sortable_by = (
         'start_date',
+        '_created_at',
     )
     empty_value_display = '-empty-'
 
@@ -59,18 +62,21 @@ class EventAdmin(ModelAdmin):
 class PublicationAdmin(ModelAdmin):
     fields = (
         'title',
+        '_created_at',
         'description',
         'image',
         'link',
     )
+    readonly_fields = ('_created_at',)
     list_display = (
         'title',
+        '_created_at',
     )
     search_fields = (
         '=title',
     )
     ordering = (
-        '_created_at',
+        '-_created_at',
     )
     sortable_by = (
         '_created_at',
