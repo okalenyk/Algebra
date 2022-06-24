@@ -6,7 +6,7 @@ authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-Django = "^3.2.9"
+Django = "^3.2.13"
 django-admin-rangefilter = "^0.8.2"
 drf-spectacular = "^0.21.0"
 django-filter = "^21.1"
