@@ -199,71 +199,100 @@ class Network(AbstractBaseModel):
         return ids_json['data']['incentives']
 
     def get_positions_in_eternal_farming(self, farming_id):
-        ids_json = send_post_request(self.subgraph_farming_url, json={'query': """query {
-          deposits(where:{eternalFarming:"%s"}){
-            id
-          }
-        }""" % farming_id})
+        result = []
+        i = 0
 
-        return ids_json['data']['deposits']
+        while True:
+            ids_json = send_post_request(self.subgraph_farming_url, json={'query': """query {
+              deposits(where:{eternalFarming:"%s"}, first:1000, skip:%s){
+                id
+              }
+            }""" % (farming_id, str(i*1000))})
+
+            result += ids_json['data']['deposits']
+
+            if len(ids_json['data']['deposits']) < 1000:
+                break
+
+        return result
 
     def get_positions_in_limit_farming(self, farming_id):
-        ids_json = send_post_request(self.subgraph_farming_url, json={'query': """query {
-          deposits(where:{incentive:"%s"}){
-            id
-          }
-        }""" % farming_id})
+        result = []
+        i = 0
 
-        return ids_json['data']['deposits']
+        while True:
+            ids_json = send_post_request(self.subgraph_farming_url, json={'query': """query {
+              deposits(where:{incentive:"%s"}, first:1000, skip:%s){
+                id
+              }
+            }""" % farming_id})
+
+            result += ids_json['data']['deposits']
+
+            if ids_json['data']['deposits'] < 1000:
+                break
+
+        return result
 
     def get_positions_by_id(self, ids):
         ids_array = [i['id'] for i in ids]
-        positions_json = send_post_request(self.subgraph_url, json={'query': """query {
-          positions(where:{id_in:%s}){
-            id
-            liquidity
-            tickLower{
-              tickIdx
-            }
-            tickUpper{
-              tickIdx
-            }
-            pool{
-              token0{
-                name
-                decimals
-                derivedMatic
-              }
-              token1{
-                name
-                decimals
-                derivedMatic
-              }
-              tick
-            }
-          }
-        }""" % str(ids_array).replace("'", '"')})
 
-        return positions_json['data']['positions']
+        result = []
+        i = 0
 
-    def get_position_snapshots_from_subgraph(self, ):
-        positions_json = send_post_request(self.subgraph_url, json={'query': """query {
-      positionSnapshots{
-        liquidity,
-        feeGrowthInside0LastX128,
-        feeGrowthInside1LastX128,
-        position{
-          id
-          tickLower{
-            tickIdx
-          }
-          tickUpper{
-            tickIdx
-          }
-        }
-      }
-    }"""})
-        return positions_json['data']['positionSnapshots']
+        while True:
+
+            positions_json = send_post_request(self.subgraph_url, json={'query': """query {
+              positions(where:{id_in:%s}, first:1000, skip:%s){
+                id
+                liquidity
+                tickLower{
+                  tickIdx
+                }
+                tickUpper{
+                  tickIdx
+                }
+                pool{
+                  token0{
+                    name
+                    decimals
+                    derivedMatic
+                  }
+                  token1{
+                    name
+                    decimals
+                    derivedMatic
+                  }
+                  tick
+                }
+              }
+            }""" % (str(ids_array).replace("'", '"'), str(i*1000))})
+
+            result += positions_json['data']['positions']
+
+            if len(positions_json['data']['positions']) < 1000:
+                break
+
+        return result
+
+    # def get_position_snapshots_from_subgraph(self, ):
+    #     positions_json = send_post_request(self.subgraph_url, json={'query': """query {
+    #   positionSnapshots{
+    #     liquidity,
+    #     feeGrowthInside0LastX128,
+    #     feeGrowthInside1LastX128,
+    #     position{
+    #       id
+    #       tickLower{
+    #         tickIdx
+    #       }
+    #       tickUpper{
+    #         tickIdx
+    #       }
+    #     }
+    #   }
+    # }"""})
+    #     return positions_json['data']['positionSnapshots']
 
     def get_positions_from_subgraph(self, ):
         positions_json = send_post_request(self.subgraph_url, json={'query': """query {

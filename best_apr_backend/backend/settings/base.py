@@ -252,11 +252,11 @@ CELERY_BEAT_SCHEDULE = {
     },
     'update_eternal_farmings_apr_task': {
         'task': 'best_apr.tasks.update_eternal_farmings_apr_task',
-        'schedule': timedelta(minutes=3),
+        'schedule': timedelta(minutes=1),
     },
     'update_limit_farmings_apr_task': {
         'task': 'best_apr.tasks.update_limit_farmings_apr_task',
-        'schedule': timedelta(minutes=3),
+        'schedule': timedelta(minutes=1),
     },
 }
 
