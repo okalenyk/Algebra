@@ -20,6 +20,20 @@ class ListPoolAprs(APIView):
         return Response(result)
 
 
+class ListEternalFarmingsTvl(APIView):
+    def get(self, request, format=None):
+        result = {}
+
+        try:
+            network_name = request.GET['network']
+        except KeyError:
+            network_name = 'Polygon'
+
+        for farming in EternalFarming.objects.filter(network__title=network_name):
+            result[farming.hash] = farming.matic_amount
+        return Response(result)
+
+
 class ListEternalFarmingsAprs(APIView):
     def get(self, request, format=None):
         result = {}
