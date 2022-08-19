@@ -26,7 +26,6 @@ def get_amounts(liquidity, tickLower, tickUpper, currentTick):
 
 
 def update_pools_apr(network: Network):
-    positions_json = network.get_positions_from_subgraph()
     pools_json = network.get_current_pools_info()
 
     pools_tick = {}
@@ -42,19 +41,21 @@ def update_pools_apr(network: Network):
             pools_fees[pool['id']] = pool['feesToken0']
         pools_fees[pool['id']] += pool['feesToken1'] * float(pool['token0Price'])
 
-    for position in positions_json:
-        current_tick = pools_tick[position['pool']['id']]
-        if int(position['tickLower']['tickIdx']) < current_tick < int(position['tickUpper']['tickIdx']):
-            (amount0, amount1) = get_amounts(
-                int(position['liquidity']),
-                int(position['tickLower']['tickIdx']),
-                int(position['tickUpper']['tickIdx']),
-                current_tick,
-            )
-            amount0 = amount0 / pow(10, int(position['token0']['decimals']))
-            amount1 = (amount1 / pow(10, int(position['token1']['decimals'])))
-            pools_current_tvl[position['pool']['id']] += amount0
-            pools_current_tvl[position['pool']['id']] += amount1 * float(position['pool']['token0Price'])
+        positions_json = network.get_positions_of_pool(pool['id'])
+
+        for position in positions_json:
+            current_tick = pools_tick[position['pool']['id']]
+            if int(position['tickLower']['tickIdx']) < current_tick < int(position['tickUpper']['tickIdx']):
+                (amount0, amount1) = get_amounts(
+                    int(position['liquidity']),
+                    int(position['tickLower']['tickIdx']),
+                    int(position['tickUpper']['tickIdx']),
+                    current_tick,
+                )
+                amount0 = amount0 / pow(10, int(position['token0']['decimals']))
+                amount1 = (amount1 / pow(10, int(position['token1']['decimals'])))
+                pools_current_tvl[position['pool']['id']] += amount0
+                pools_current_tvl[position['pool']['id']] += amount1 * float(position['pool']['token0Price'])
 
     for pool in pools_json:
         pool_object = Pool.objects.filter(address=pool['id'])

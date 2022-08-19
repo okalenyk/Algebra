@@ -241,7 +241,6 @@ class Network(AbstractBaseModel):
         i = 0
 
         while True:
-
             positions_json = send_post_request(self.subgraph_url, json={'query': """query {
               positions(where:{id_in:%s}, first:1000, skip:%s){
                 id
@@ -294,31 +293,41 @@ class Network(AbstractBaseModel):
     # }"""})
     #     return positions_json['data']['positionSnapshots']
 
-    def get_positions_from_subgraph(self, ):
-        positions_json = send_post_request(self.subgraph_url, json={'query': """query {
-            positions(first:1000, where:{liquidity_gt:0}){
-            tickLower{
-                tickIdx
-            }
-            tickUpper{
-                tickIdx
-            }
-            liquidity
-            depositedToken0
-            depositedToken1
-            token0{
-              decimals
-            }
-            token1{
-              decimals
-            }
-            pool{
-              id
-              token0Price
-            }
-          }
-        }"""})
-        return positions_json['data']['positions']
+    def get_positions_of_pool(self, pool):
+        result = []
+        i = 0
+
+        while True:
+            positions_json = send_post_request(self.subgraph_url, json={'query': """query {
+                positions(first:1000, skip:%s, where:{liquidity_gt:0, pool:"%s"}){
+                tickLower{
+                    tickIdx
+                }
+                tickUpper{
+                    tickIdx
+                }
+                liquidity
+                depositedToken0
+                depositedToken1
+                token0{
+                  decimals
+                }
+                token1{
+                  decimals
+                }
+                pool{
+                  id
+                  token0Price
+                }
+              }
+            }""" % (str(i*1000), pool)})
+
+            result += positions_json['data']['positions']
+
+            if len(positions_json['data']['positions']) < 1000:
+                break
+
+        return result
 
     def get_previous_block_number(self):
         previous_date = int(time()) - settings.APR_DELTA
