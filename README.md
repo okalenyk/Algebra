@@ -4,6 +4,8 @@ Basically for local start up you can just copy the `.env.example` as it is
 **For production you should change .env**:
 1) set BACKEND_SETTINGS_MODE to `production`
 2) set HTTP_TEMPLATE_DIR to `/etc/nginx/templates/ssl`
+3) change all passwords to secure
+4) change variables with host, ports, etc. as required
 
 ****
 ### 2 Place SSL certificates to the ./docker/nginx/ssl dir
