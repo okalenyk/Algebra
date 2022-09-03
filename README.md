@@ -7,11 +7,9 @@ Basically for local start up you can just copy the `.env.example` as it is
 3) change all passwords to secure
 4) change variables with host, ports, etc. as required
 
-****
 ### 2 Place SSL certificates to the ./docker/nginx/ssl dir
 
 **Files have to be named exactly as in `./docker/nginx/templates/ssl/[template]`**
-****
 
 ### 3 Start the project
 
@@ -53,6 +51,8 @@ Create a superuser to be able to access admin site
 And then after some time the task are going to be run taking into the account new network
 
 ## Additional info
+
+**All the amounts are displayed as _MATIC_ but is not converted into Matic exactly. This is just a name to the native tokens (since we deployed to the Polygon)**
 
 ### Update tasks
 
