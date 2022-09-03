@@ -1,46 +1,14 @@
-from logging import exception, warning, info
-from uuid import UUID
 from time import time
 
 from django.conf import settings
 from django.db.models import (
     CharField,
-    DecimalField,
-    ForeignKey,
-    JSONField,
-    PositiveIntegerField,
-    PROTECT,
     URLField,
+    JSONField
 )
-from eth_utils import add_0x_prefix
-from web3 import Web3, HTTPProvider
-from web3.datastructures import AttributeDict
-from web3.exceptions import TransactionNotFound
-from web3.types import HexBytes
 
 from base.models import AbstractBaseModel
 from base.requests import send_post_request
-from backend.consts import (
-    ETH_LIKE_ADDRESS_LENGTH,
-    ETH_LIKE_HASH_LENGTH,
-    MAX_WEI_DIGITS,
-    NETWORK_ERROR,
-    RPC_PROVIDER_ERROR,
-    RPC_PROVIDER_INFO,
-    TRANSACTION_ERROR,
-    TRANSACTION_INFO,
-    TRANSACTION_WARNING,
-)
-from networks.types import HASH_LIKE, ADDRESS_LIKE
-from .exceptions import (
-    CustomRpcProviderExceedListRange,
-    NetworkNotFound,
-    ProviderNotConnected,
-)
-from .services.functions import (
-    convert_to_checksum_address_format,
-    reset_connection,
-)
 
 
 # Create your models here.
