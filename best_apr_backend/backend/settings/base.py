@@ -56,12 +56,8 @@ INSTALLED_APPS = [
 
     # APPS
     'best_apr',
-    'contracts',
     'content',
-    # 'blockchain_explorers',
     'networks',
-    #'tokens',
-    # 'vault_swaps',
     'users',
     ###
 ]
@@ -292,9 +288,6 @@ EMAIL_HOST_PASSWORD = str(environ.get('EMAIL_HOST_PASSWORD'))
 EMAIL_TO = str(environ.get('EMAIL_TO'))
 
 # # OTHER
-SUBGRAPH_URL = str(environ.get('SUBGRAPH_URL'))
-SUBGRAPH_BLOCKS_URLS = str(environ.get('SUBGRAPH_BLOCKS_URLS'))
-SUBGRAPH_FARMING_URL = str(environ.get('SUBGRAPH_FARMING_URL'))
 BLOCK_DELTA = int(environ.get('BLOCK_DELTA'))
 APR_DELTA = int(environ.get('APR_DELTA'))
 DEFAULT_TXN_TIMEOUT = int(environ.get('DEFAULT_TXN_TIMEOUT'))

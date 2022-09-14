@@ -1,6 +1,6 @@
 from django.contrib.admin import register, ModelAdmin
 
-from .models import Network, Transaction
+from .models import Network
 
 
 # Register your models here.
@@ -8,7 +8,6 @@ from .models import Network, Transaction
 class NetworkModelAdmin(ModelAdmin):
     fields = (
         'title',
-        'rpc_url_list',
         'subgraph_url',
         'subgraph_blocks_urls',
         'subgraph_farming_url',
@@ -17,7 +16,6 @@ class NetworkModelAdmin(ModelAdmin):
     list_display = (
         'id',
         'title',
-        'rpc_url_list',
         '_created_at',
         '_updated_at',
         '_is_displayed',
@@ -36,96 +34,3 @@ class NetworkModelAdmin(ModelAdmin):
     )
     empty_value_display = '-empty-'
 
-
-@register(Transaction)
-class TransactionModelAdmin(ModelAdmin):
-    fields = (
-        'network',
-        'hash',
-        'block_hash',
-        'block_number',
-        'sender',
-        'receiver',
-        'gas',
-        'gas_price',
-        'nonce',
-        'sign_r',
-        'sign_s',
-        'sign_v',
-        'index',
-        'type',
-        'value',
-        'data',
-        'event_data',
-        '_is_displayed',
-    )
-    list_display = (
-        'id',
-        'network',
-        'hash',
-        'block_number',
-        'sender',
-        'receiver',
-        'gas',
-        'gas_price',
-        '_created_at',
-        '_updated_at',
-        '_is_displayed',
-    )
-    list_filter = (
-        'network__title',
-        '_created_at',
-        '_updated_at',
-        '_is_displayed',
-    )
-    search_fields = (
-        '=id',
-        'hash',
-        'sender',
-        'receiver',
-    )
-    ordering = (
-        '-_created_at',
-    )
-    empty_value_display = '-empty-'
-    autocomplete_fields = (
-        'network',
-    )
-
-
-# @register(Provider)
-# class ProviderModelAdmin(ModelAdmin):
-#     fields = (
-#         'title',
-#         'type',
-#         'from_network',
-#         'to_network',
-#     )
-#     list_display = (
-#         'id',
-#         'title',
-#         'type',
-#         'from_network',
-#         'to_network',
-#         '_created_at',
-#         '_updated_at',
-#         '_is_displayed',
-#     )
-#     list_filter = (
-#         'type',
-#         '_created_at',
-#         '_updated_at',
-#         '_is_displayed',
-#     )
-#     search_fields = (
-#         '=id',
-#         'title',
-#     )
-#     ordering = (
-#         '-_created_at',
-#     )
-#     empty_value_display = '-empty-'
-#     autocomplete_fields = (
-#         'from_network',
-#         'to_network',
-#     )
