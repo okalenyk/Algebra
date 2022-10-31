@@ -30,7 +30,7 @@ class ListEternalFarmingsTvl(APIView):
             network_name = 'Polygon'
 
         for farming in EternalFarming.objects.filter(network__title=network_name):
-            result[farming.hash] = farming.matic_amount
+            result[farming.hash] = farming.native_amount
         return Response(result)
 
 
@@ -58,7 +58,7 @@ class ListLimitFarmingsTvl(APIView):
             network_name = 'Polygon'
 
         for farming in LimitFarming.objects.filter(network__title=network_name):
-            result[farming.hash] = farming.matic_amount
+            result[farming.hash] = farming.native_amount
         return Response(result)
 
 

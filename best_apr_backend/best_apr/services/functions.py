@@ -81,7 +81,7 @@ def update_eternal_farmings_apr(network: Network):
         token_ids = network.get_positions_in_eternal_farming(farming['id'])
         token0 = network.get_token_info_by_address(farming['rewardToken'])[0]
         token1 = network.get_token_info_by_address(farming['bonusRewardToken'])[0]
-        total_matic_amount = 0.0
+        total_native_amount = 0.0
         positions = network.get_positions_by_id(token_ids)
         for position in positions:
             (amount0, amount1) = get_amounts(
@@ -90,17 +90,17 @@ def update_eternal_farmings_apr(network: Network):
                 int(position['tickUpper']['tickIdx']),
                 int(position['pool']['tick']),
             )
-            total_matic_amount += amount0 * \
+            total_native_amount += amount0 * \
                                   float(position['pool']['token0']['derivedMatic']) \
                                   / 10 ** int(position['pool']['token0']['decimals'])
-            total_matic_amount += amount1 \
+            total_native_amount += amount1 \
                                   * float(position['pool']['token1']['derivedMatic']) \
                                   / 10 ** int(position['pool']['token1']['decimals'])
         reward0_per_second = int(farming['rewardRate']) * float(token0['derivedMatic']) / 10 ** int(token0['decimals'])
         reward1_per_second = int(farming['bonusRewardRate']) * float(token1['derivedMatic']) / 10 ** int(
             token1['decimals'])
         apr = (reward0_per_second + reward1_per_second) \
-              / total_matic_amount * 60 * 60 * 24 * 365 * 100 if total_matic_amount > 0 else \
+              / total_native_amount * 60 * 60 * 24 * 365 * 100 if total_native_amount > 0 else \
             -1.0
 
         farming_object = EternalFarming.objects.filter(hash=farming['id'])
@@ -112,7 +112,7 @@ def update_eternal_farmings_apr(network: Network):
         else:
             farming_object = farming_object[0]
         farming_object.last_apr = apr
-        farming_object.matic_amount = total_matic_amount
+        farming_object.native_amount = total_native_amount
         farming_object.save()
 
 
@@ -122,7 +122,7 @@ def update_limit_farmings_apr(network: Network):
         token_ids = network.get_positions_in_limit_farming(farming['id'])
         token0 = network.get_token_info_by_address(farming['rewardToken'])[0]
         token1 = network.get_token_info_by_address(farming['bonusRewardToken'])[0]
-        total_matic_amount = 0.0
+        total_native_amount = 0.0
         positions = network.get_positions_by_id(token_ids)
         for position in positions:
             (amount0, amount1) = get_amounts(
@@ -131,10 +131,10 @@ def update_limit_farmings_apr(network: Network):
                 int(position['tickUpper']['tickIdx']),
                 int(position['pool']['tick']),
             )
-            total_matic_amount += amount0 * \
+            total_native_amount += amount0 * \
                                   float(position['pool']['token0']['derivedMatic']) \
                                   / 10 ** int(position['pool']['token0']['decimals'])
-            total_matic_amount += amount1 \
+            total_native_amount += amount1 \
                                   * float(position['pool']['token1']['derivedMatic']) \
                                   / 10 ** int(position['pool']['token1']['decimals'])
 
@@ -144,8 +144,8 @@ def update_limit_farmings_apr(network: Network):
         rewards_amount_1 = int(farming['bonusReward']) * float(token1['derivedMatic']) / \
                            10 ** int(token1['decimals'])
 
-        apr = (rewards_amount_0 + rewards_amount_1) * duration / total_matic_amount * 100 \
-            if total_matic_amount > 0 and int(farming['endTime']) > int(datetime.now().timestamp()) else -1
+        apr = (rewards_amount_0 + rewards_amount_1) * duration / total_native_amount * 100 \
+            if total_native_amount > 0 and int(farming['endTime']) > int(datetime.now().timestamp()) else -1
 
         farming_object = LimitFarming.objects.filter(hash=farming['id'])
         if not farming_object:
@@ -155,6 +155,6 @@ def update_limit_farmings_apr(network: Network):
             )
         else:
             farming_object = farming_object[0]
-        farming_object.matic_amount = total_matic_amount
+        farming_object.native_amount = total_native_amount
         farming_object.last_apr = apr
         farming_object.save()

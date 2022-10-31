@@ -37,12 +37,12 @@ class PoolAdmin(ModelAdmin):
 class EternalFarmingAdmin(ModelAdmin):
     fields = (
         'hash',
-        'matic_amount',
+        'native_amount',
         'last_apr'
     )
     list_display = (
         'hash',
-        'matic_amount',
+        'native_amount',
         'network',
         'last_apr'
     )
@@ -66,12 +66,12 @@ class EternalFarmingAdmin(ModelAdmin):
 class LimitFarmingAdmin(ModelAdmin):
     fields = (
         'hash',
-        'matic_amount',
+        'native_amount',
         'last_apr'
     )
     list_display = (
         'hash',
-        'matic_amount',
+        'native_amount',
         'network',
         'last_apr'
     )
