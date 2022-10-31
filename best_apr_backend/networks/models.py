@@ -59,7 +59,7 @@ class Network(AbstractBaseModel):
 
     def get_limit_farmings_info(self, ):
         ids_json = send_post_request(self.subgraph_farming_url, json={'query': """query {
-          incentives{
+          limitFarmings{
             id
             rewardToken
             bonusRewardToken
@@ -70,7 +70,7 @@ class Network(AbstractBaseModel):
           }
         }"""})
 
-        return ids_json['data']['incentives']
+        return ids_json['data']['limitFarmings']
 
     def get_positions_in_eternal_farming(self, farming_id):
         result = []
