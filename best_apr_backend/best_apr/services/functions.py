@@ -3,6 +3,7 @@ from math import sqrt
 from datetime import datetime
 from networks.models import Network
 from best_apr.models import Pool, EternalFarming, LimitFarming
+from backend.consts import DEFAULT_CRYPTO_ADDRESS
 
 
 def tick_to_sqrt_price(tick):
@@ -80,7 +81,6 @@ def update_eternal_farmings_apr(network: Network):
     for farming in farmings:
         token_ids = network.get_positions_in_eternal_farming(farming['id'])
         token0 = network.get_token_info_by_address(farming['rewardToken'])[0]
-        token1 = network.get_token_info_by_address(farming['bonusRewardToken'])[0]
         total_native_amount = 0.0
         positions = network.get_positions_by_id(token_ids)
         for position in positions:
@@ -96,10 +96,13 @@ def update_eternal_farmings_apr(network: Network):
             total_native_amount += amount1 \
                                   * float(position['pool']['token1']['derivedMatic']) \
                                   / 10 ** int(position['pool']['token1']['decimals'])
-        reward0_per_second = int(farming['rewardRate']) * float(token0['derivedMatic']) / 10 ** int(token0['decimals'])
-        reward1_per_second = int(farming['bonusRewardRate']) * float(token1['derivedMatic']) / 10 ** int(
-            token1['decimals'])
-        apr = (reward0_per_second + reward1_per_second) \
+
+        reward_per_second = int(farming['rewardRate']) * float(token0['derivedMatic']) / 10 ** int(token0['decimals'])
+        if farming['bonusRewardToken'] != DEFAULT_CRYPTO_ADDRESS:
+            token1 = network.get_token_info_by_address(farming['bonusRewardToken'])[0]
+            reward_per_second += int(farming['bonusRewardRate']) * float(token1['derivedMatic']) / 10 ** int(
+                token1['decimals'])
+        apr = (reward_per_second) \
               / total_native_amount * 60 * 60 * 24 * 365 * 100 if total_native_amount > 0 else \
             -1.0
 
