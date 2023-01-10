@@ -210,7 +210,6 @@ class Network(AbstractBaseModel):
                 number
               }
         }""" % (str(previous_date), str(previous_date - settings.BLOCK_DELTA))})
-        print((str(previous_date), str(previous_date - settings.BLOCK_DELTA)))
         return block_json['data']['blocks'][0]['number']
 
     def get_current_pools_info(self):
