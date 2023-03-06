@@ -50,10 +50,6 @@ Create a superuser to be able to access admin site
 
 And then after some time the task are going to be run taking into the account new network
 
-## Additional info
-
-**All the amounts are displayed as _MATIC_ but is not converted into Matic exactly. This is just a name to the native tokens (since we deployed to the Polygon)**
-
 ### Update tasks
 
 Default settings are:
