@@ -173,22 +173,14 @@ class Network(AbstractBaseModel):
 
         while True:
             positions_json = send_post_request(self.subgraph_url, json={'query': """query {
-                positions(first:1000, skip:%s, where:{liquidity_gt:0, pool:"%s"}){
-                tickLower{
+                poolPositions(first:1000, skip:%s, where:{liquidity_gt:0, pool:"%s"}){
+                lowerTick{
                     tickIdx
                 }
-                tickUpper{
+                upperTick{
                     tickIdx
                 }
                 liquidity
-                depositedToken0
-                depositedToken1
-                token0{
-                  decimals
-                }
-                token1{
-                  decimals
-                }
                 pool{
                   id
                   token0Price
@@ -196,9 +188,9 @@ class Network(AbstractBaseModel):
               }
             }""" % (str(i*1000), pool)})
 
-            result += positions_json['data']['positions']
+            result += positions_json['data']['poolPositions']
 
-            if len(positions_json['data']['positions']) < 1000:
+            if len(positions_json['data']['poolPositions']) < 1000:
                 break
 
         return result
@@ -219,9 +211,11 @@ class Network(AbstractBaseModel):
             feesToken1
             id
             token0{
+            decimals
             name
             }
             token1{
+            decimals
             name
             }
             token0Price
@@ -240,9 +234,11 @@ class Network(AbstractBaseModel):
             feesToken1
             id
             token0{
+            decimals
             name
             }
             token1{
+            decimals
             name
             }
             token0Price
