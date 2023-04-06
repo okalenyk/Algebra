@@ -96,14 +96,14 @@ class Network(AbstractBaseModel):
 
         while True:
             ids_json = send_post_request(self.subgraph_farming_url, json={'query': """query {
-              deposits(where:{incentive:"%s"}, first:1000, skip:%s){
+              deposits(where:{limitFarming:"%s"}, first:1000, skip:%s){
                 id
               }
-            }""" % farming_id})
+            }""" % (farming_id, str(i*1000))})
 
             result += ids_json['data']['deposits']
 
-            if ids_json['data']['deposits'] < 1000:
+            if len(ids_json['data']['deposits']) < 1000:
                 break
 
         return result
