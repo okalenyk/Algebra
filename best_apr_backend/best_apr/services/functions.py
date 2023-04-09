@@ -46,15 +46,15 @@ def update_pools_apr(network: Network):
 
         for position in positions_json:
             current_tick = pools_tick[position['pool']['id']]
-            if int(position['tickLower']['tickIdx']) < current_tick < int(position['tickUpper']['tickIdx']):
+            if int(position['lowerTick']['tickIdx']) < current_tick < int(position['upperTick']['tickIdx']):
                 (amount0, amount1) = get_amounts(
                     int(position['liquidity']),
-                    int(position['tickLower']['tickIdx']),
-                    int(position['tickUpper']['tickIdx']),
+                    int(position['lowerTick']['tickIdx']),
+                    int(position['upperTick']['tickIdx']),
                     current_tick,
                 )
-                amount0 = amount0 / pow(10, int(position['token0']['decimals']))
-                amount1 = (amount1 / pow(10, int(position['token1']['decimals'])))
+                amount0 = amount0 / pow(10, int(pool['token0']['decimals']))
+                amount1 = (amount1 / pow(10, int(pool['token1']['decimals'])))
                 pools_current_tvl[position['pool']['id']] += amount0
                 pools_current_tvl[position['pool']['id']] += amount1 * float(position['pool']['token0Price'])
 
