@@ -2,7 +2,7 @@ from corsheaders.defaults import default_headers
 
 from .base import *
 
-ALLOWED_HOSTS = environ.get('BACKEND_ALLOWED_HOSTS').split()
+ALLOWED_HOSTS = environ.get('BACKEND_ALLOWED_HOSTS').split(',')
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -16,11 +16,11 @@ CSRF_COOKIE_SAMESITE = 'None'
 
 CSRF_COOKIE_SECURE = True
 
-CSRF_TRUSTED_ORIGINS = environ.get('BACKEND_CSRF_TRUSTED_ORIGINS').split()
+CSRF_TRUSTED_ORIGINS = environ.get('BACKEND_CSRF_TRUSTED_ORIGINS').split(',')
 
-CORS_ALLOWED_ORIGINS = environ.get('CORS_ALLOWED_ORIGINS').split()
+CORS_ALLOWED_ORIGINS = environ.get('CORS_ALLOWED_ORIGINS').split(',')
 
-CORS_ORIGIN_WHITELIST = environ.get('CORS_ALLOWED_ORIGINS').split()
+CORS_ORIGIN_WHITELIST = environ.get('CORS_ALLOWED_ORIGINS').split(',')
 
 CORS_ALLOW_CREDENTIALS = bool(int(environ.get('CORS_ALLOW_CREDENTIALS')))
 
@@ -36,4 +36,4 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 
 CORS_ORIGIN_ALLOW_ALL = bool(int(environ.get('CORS_ORIGIN_ALLOW_ALL')))
 
-CORS_ALLOW_METHODS = environ.get('CORS_ALLOW_METHODS').split()
+CORS_ALLOW_METHODS = environ.get('CORS_ALLOW_METHODS').split(',')
