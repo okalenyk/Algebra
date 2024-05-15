@@ -94,3 +94,31 @@ To deploy all modules in specific network:
 ```
 $ node scripts/deployAll.js <network>
 ```
+
+## Verify
+
+### AlgebraPool
+
+- Go to `src/core` folder
+
+- Run `verify` command:
+
+```
+npx hardhat verify --network mode <algebra-pool-address>
+```
+
+### AlgebraBasePluginV1
+
+- Go to `src/plugin` folder
+
+- Update first arg in `plugin-args.ts` file to Algebra pool of the plugin. Use `AlgebraBasePluginV1` constructor as a reference for `plugin-args.ts`:
+
+```solidity
+constructor(address _pool, address _factory, address _pluginFactory)
+```
+
+- Run `verify` command:
+
+```
+npx hardhat verify --network mode <algebra-plugin-address> --constructor-args plugin-args.ts
+```
