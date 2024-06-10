@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: algebra-celery-worker-configmap
+  namespace: algebra
+data:
+  CELERY_SERVICE_NAME: "celery-worker"
+  CELERY_CONCURRENCY: "2"
+

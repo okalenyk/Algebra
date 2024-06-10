@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: algebra-celery-worker
+  namespace: algebra
+  labels:
+    app: algebra-celery-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: algebra-celery-worker
+  template:
+    metadata:
+      labels:
+        app: algebra-celery-worker
+    spec:
+      serviceAccountName: kim-algebra
+      containers:
+        - name: algebra-celery-worker
+          image: >-
+              europe-west3-docker.pkg.dev/kim-testnet/kim-algebra/kim-algebra-bakend:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          command:
+            - celery
+            - --app
+            - backend
+            - worker
+            - --loglevel=DEBUG
+            - -E
+            - --logfile=celery.log
+          envFrom:
+            - configMapRef:
+                name: algebra-celery-worker-configmap
+            - configMapRef:
+                name: algebra-backend-configmap
+            - secretRef:
+                name: backend-secret
+            - secretRef:
+                name: broker-secret
+            - secretRef:
+                name: db-secret
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "200m"
+            limits:
+              memory: "500Mi"
+              cpu: "200m"
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      imagePullSecrets:
+        - name: artifact-registry
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
