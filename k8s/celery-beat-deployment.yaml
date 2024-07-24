@@ -15,11 +15,11 @@ spec:
       labels:
         app: algebra-celery-beat
     spec:
-      serviceAccountName: kim-algebra
+      serviceAccountName: scribe-algebra
       containers:
         - name: algebra-celery-beat
           image: >-
-              europe-west3-docker.pkg.dev/kim-testnet/kim-algebra/kim-algebra-bakend:latest
+              europe-west3-docker.pkg.dev/scribe-exchange/scribe-algebra/scribe-algebra-backend:latest
           ports:
             - containerPort: 8080
               protocol: TCP

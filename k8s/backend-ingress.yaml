@@ -13,10 +13,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - backend.kim.exchange
+        - backend.scribe.exchange
       secretName: algebra-backend-tls
   rules:
-    - host: backend.kim.exchange
+    - host: backend.scribe.exchange
       http:
         paths:
           - path: /
