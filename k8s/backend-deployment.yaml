@@ -30,6 +30,8 @@ spec:
             - backend.asgi:application
             - -k
             - uvicorn.workers.UvicornWorker
+            - '--timeout'
+            - '600'
           envFrom:
             - configMapRef:
                 name: algebra-backend-configmap
